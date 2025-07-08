@@ -22,7 +22,7 @@ class AttendanceController extends Controller
         $unionEmployees = $employees->union($employeesLeaves)->get()->groupBy(['BAG', 'NPK', 'TANGGAL']);
 
         // $unionEmployees = [];
-        dd($unionEmployees['GA MANAGER']);
+        // dd($unionEmployees['GA MANAGER']);
 
         return view('attendance.index', compact('unionEmployees'));
     }
@@ -59,7 +59,7 @@ class AttendanceController extends Controller
         $groupedByNPK = $unionEmployees->groupBy('NPK');
         $groupedByTanggal = $unionEmployees->groupBy('TANGGAL');
 
-        dd($groupedByTanggal);
+        // dd($groupedByTanggal);
 
         $pdf = Pdf::loadView('template.report', compact('unionEmployees'));
 
