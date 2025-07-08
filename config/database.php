@@ -96,16 +96,16 @@ return [
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_EXT_HOST', 'localhost'),
-            'port' => env('DB_EXT_PORT', '1433'),
-            'database' => env('DB_EXT_DATABASE', 'forge'),
-            'username' => env('DB_EXT_USERNAME', 'forge'),
-            'password' => env('DB_EXT_PASSWORD', ''),
+            'host' => env('DB_CHUTEX_HOST', 'localhost'),
+            'port' => env('DB_CHUTEX_PORT', '1433'),
+            'database' => env('DB_CHUTEX_DATABASE', 'forge'),
+            'username' => env('DB_CHUTEX_USERNAME', 'forge'),
+            'password' => env('DB_CHUTEX_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
-            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+            'encrypt' => 'yes',
+            'trust_server_certificate' => true
         ],
 
     ],
@@ -140,7 +140,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

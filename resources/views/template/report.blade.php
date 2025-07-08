@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    
 @php
 $keterangan = '-';
 $jamMasuk = '-';
@@ -141,9 +140,6 @@ $jamPulang = '-';
                     </tr>
                 </thead>    
                 <tbody>
-                    {{-- @php
-                        dd($attendanceCollection->first());
-                    @endphp --}}
                     @foreach($groupedByNPK as $npk => $npkCollection)
                         @if($bagian == $npkCollection[0]->BAG)
                             <tr>
@@ -153,88 +149,45 @@ $jamPulang = '-';
 
                                 {{-- @if($dateCollection[0]->TANGGAL == \Carbon\Carbon::parse($date)->format('Y-m-d') && $dateCollection[0]->NPK == $npkCollection[0]->NPK) --}}
                                 @for($date = $startOfMonth; $date <= $endOfMonth; $date++)
-                                    <td class="date-cell">
-                                        @foreach($groupedByTanggal as $dateCollection => $dateArray) 
-                                            @for($i = 0; $i < count($dateArray); $i++)
-                                            
-                                                @if($date == \Carbon\Carbon::parse($dateArray[0]->TANGGAL)->format('d'))
-                                                    @php
-                                                        $keterangan = '-';
-                                                        $jamMasuk = '-';
-                                                        $jamPulang = '-';
-                                                    @endphp
-                                                    @if($dateArray[$i]->NPK == $npk)
-                                                        @php
-                                                            $keterangan = $dateArray[$i]->KETERANGAN;
-                                                            $jamMasuk = $dateArray[$i]->JAM_PAGI;
-                                                            $jamPulang = $dateArray[$i]->JAM_SIANG;
-                                                        @endphp
-                                                    @endif
-
-                                                {{-- @else 
-                                                    <div class="status">
-                                                        -
-                                                    </div>
-                                                    <div class="status">
-                                                        -
-                                                    </div>
-                                                    <div class="status">
-                                                        -
-                                                    </div> --}}
-                                                @endif
-                                            @endfor
-                                        @endforeach
-                                        
+                                <td>
+                                    @foreach($groupedByTanggal as $dateCollection => $dateArray) 
+                                        @for($i = 0; $i < count($dateArray); $i++)
+                                            @if($date == \Carbon\Carbon::parse($dateArray[$i]->TANGGAL)->format('d') && $dateArray[$i]->NPK == $npk)
+                                                @php
+                                                    $keterangan = $dateArray[$i]->KETERANGAN;
+                                                    $jamMasuk = $dateArray[$i]->JAM_PAGI;
+                                                    $jamPulang = $dateArray[$i]->JAM_SIANG;
+                                                @endphp
+                                            @endif
+                                        @endfor
+                                    @endforeach
                                         <div class="status">
-                                            {{ $keterangan}}
+                                            {{ $keterangan }}
                                         </div>
                                         <div class="status">
                                             {{ $jamMasuk }}
                                         </div>
                                         <div class="status">
-                                            {{ $jamPulang}}
+                                            {{ $jamPulang }}
                                         </div>
+                                        @php
+                                            $keterangan = '-';
+                                            $jamMasuk = '-';
+                                            $jamPulang = '-';
+                                        @endphp
                                     </td>
-
-
-
-                                {{-- @php
-                                    dd($groupedByNPK);
-                                @endphp --}}
-                                    {{-- @foreach($groupedByTanggal as $dateCollection => $dateArray)  --}}
-                                    {{-- @php
-                                        dd(count($dateArray));
-                                    @endphp --}}
-                                            {{-- @for($i = 0; $i < count($dateArray); $i++) --}}
-                                                {{-- @if(\Carbon\Carbon::parse($dateArray[0]->TANGGAL)->format('d') == $date && $dateArray[0]->NPK == $npk)     --}}
-                                                    {{-- <td class="date-cell"> --}}
-                                                        {{-- <div class="status">
-                                                            {{ $dateArray[0]->KETERANGAN }}
-                                                        </div>
-                                                        <div class="status">
-                                                            {{ $dateArray[0]->NPK }}
-                                                        </div>
-                                                        <div class="status">
-                                                            {{ $dateArray[0]->NAMA_KARYAWAN }}
-                                                        </div> --}}
-                                                    {{-- </td> --}}
-                                                {{-- @else 
-                                                    <td class="date-cell">
-                                                        <div class="status">
-                                                            -
-                                                        </div>
-                                                        <div class="status">
-                                                            -
-                                                        </div>
-                                                        <div class="status">
-                                                            -
-                                                        </div>
-                                                    </td>
-                                                @endif --}}
-                                            {{-- @endfor --}}
-                                    {{-- @endforeach --}}
                                 @endfor
-                                <td>{{'keterangan'}}</td>
+                                <td>
+                                    <div class="status">
+                                        {{ 'Status' }}
+                                    </div>
+                                    <div class="status">
+                                        {{ 'Jam Datang' }}
+                                    </div>
+                                    <div class="status">
+                                        {{ 'Jam Pulang' }}
+                                    </div>
+                                </td>
                             </tr>
                         @endif
                     @endforeach
