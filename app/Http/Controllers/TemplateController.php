@@ -11,12 +11,14 @@ class TemplateController extends Controller
 
     public function audit()
     {
-        $employees = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.*', 'AUDIT.TANGGAL', 'AUDIT.SUBDIVISI', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA.NPK', '=', 'AUDIT.NPK')->where('AUDIT.TANGGAL', '>=', '2025-05-23')->where('AUDIT.TANGGAL', '<=', '2025-05-28');
-        $employeesLeaves = DB::connection('sqlsrv')->table('BIODATA_KELUAR')->select('BIODATA_KELUAR.*', 'AUDIT.TANGGAL', 'AUDIT.SUBDIVISI', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM',  'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA_KELUAR.NPK', '=', 'AUDIT.NPK')->where('AUDIT.TANGGAL', '>=', '2025-05-23')->where('AUDIT.TANGGAL', '<=', '2025-05-28');
+        $employees = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.*', 'AUDIT.TANGGAL', 'AUDIT.SUBDIVISI', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA.NPK', '=', 'AUDIT.NPK');
+        $employeesLeaves = DB::connection('sqlsrv')->table('BIODATA_KELUAR')->select('BIODATA_KELUAR.*', 'AUDIT.TANGGAL', 'AUDIT.SUBDIVISI', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM',  'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA_KELUAR.NPK', '=', 'AUDIT.NPK');
 
         // $unionEmployees = $employees->union($employeesLeaves)->get()->groupBy(['BAG', 'NPK', 'TANGGAL']);
 
-        $unionEmployees = $employees->union($employeesLeaves)->get();
+        $unionEmployees = $employees->get();
+
+        // dd($unionEmployees);
 
         $groupedByBag = $unionEmployees->groupBy('BAG');
         $groupedByNPK = $unionEmployees->groupBy('NPK');
@@ -53,5 +55,13 @@ class TemplateController extends Controller
             'groupedByNPK',
             'groupedByTanggal'
         ]));
+    }
+
+    public function audit2()
+    {
+        $employeeGroup = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.*')->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->get();
+        $employees = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.*', 'DEPT.DEPARTEMENT', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA.NPK', '=', 'AUDIT.NPK')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->orderBy('AUDIT.TANGGAL', 'ASC')->get();
+        // dd($employees);
+        return view('template.report2', compact('employees', 'employeeGroup'));
     }
 }

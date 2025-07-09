@@ -121,7 +121,6 @@ $jamPulang = '-';
 
     <div class="table-container">
         @foreach($groupedByBag as $bagian => $bagianCollection)
-
             <table>
                 <thead>
                     @php
@@ -147,9 +146,8 @@ $jamPulang = '-';
                                 <td>{{ $npkCollection[0]->NPK }}</td>
                                 <td style="width: 100px;">{{ $npkCollection[0]->NAMA_KARYAWAN }}</td>
 
-                                {{-- @if($dateCollection[0]->TANGGAL == \Carbon\Carbon::parse($date)->format('Y-m-d') && $dateCollection[0]->NPK == $npkCollection[0]->NPK) --}}
                                 @for($date = $startOfMonth; $date <= $endOfMonth; $date++)
-                                <td>
+                                    <td>
                                     @foreach($groupedByTanggal as $dateCollection => $dateArray) 
                                         @for($i = 0; $i < count($dateArray); $i++)
                                             @if($date == \Carbon\Carbon::parse($dateArray[$i]->TANGGAL)->format('d') && $dateArray[$i]->NPK == $npk)
@@ -198,4 +196,4 @@ $jamPulang = '-';
         @endforeach
     </div>
 </body>
-</html>
+</html>22:00 7/8/202522:49 7/8/2025

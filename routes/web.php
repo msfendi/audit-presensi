@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Template
     Route::get('/template/audit', [TemplateController::class, 'audit'])->name('template.audit');
+    Route::get('/template/audit2', [TemplateController::class, 'audit2'])->name('template.audit2');
 
 });
 
