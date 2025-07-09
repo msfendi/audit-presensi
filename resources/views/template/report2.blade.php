@@ -155,13 +155,29 @@ $loopDays = 1;
                 </td>
                     @foreach($employees as $employee)
                         @if($group->NPK == $employee->NPK)
+                        @if($employee->TANGGAL == null || (int)\Carbon\Carbon::parse($employee->TANGGAL)->format('d') == $getTotalDays)
+                        @for($loopDays;$loopDays < $getTotalDays;$loopDays++)
+                                <td>-<br> {{$loopDays}}</td>
+                            @endfor
+                        @endif
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employee->TANGGAL)->format('d');$loopDays++)
                             <td>-</td>
                             @endfor
-                            @php
-                                $loopDays = (int)\Carbon\Carbon::parse($employee->TANGGAL)->format('d') + 1 ;
-                            @endphp
-                            <td>{{$employee->JAM_PAGI}}</td>
+                                @if($employee->TANGGAL == null)
+                                @php
+                                    $loopDays = $getTotalDays;
+                                @endphp
+                                <td>{{$employee->JAM_PAGI ?? '-'}} <br> {{$loopDays}}</td>
+                                <td>Keterangan</td>
+                                @else
+                                @php
+                                    $loopDays = (int)\Carbon\Carbon::parse($employee->TANGGAL)->format('d') + 1 ;
+                                @endphp
+                                <td>{{$employee->JAM_PAGI ?? '-'}} <br> {{$loopDays}}</td>
+                                @endif
+                            @if($loopDays == $getTotalDays + 1)
+                            <td>Keterangan</td>
+                            @endif
                         @else
                         @php
                             $loopDays = 1;
