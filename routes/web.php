@@ -25,7 +25,8 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', [LoginController::class, 'login'])->name('/');
-Route::get('/template/audit2', [TemplateController::class, 'audit2'])->name('template.audit2');
+Route::get('/template/auditsewing', [TemplateController::class, 'auditsewing'])->name('template.auditsewing');
+Route::get('/template/auditnonsewing', [TemplateController::class, 'auditnonsewing'])->name('template.auditnonsewing');
 
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/register', [RegisterController::class, 'index'])->name('register');
