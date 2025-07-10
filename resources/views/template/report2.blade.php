@@ -132,7 +132,8 @@ $lastDate = 0;
 </head>
 <body>
     <div class="header">
-        <h2>Data Kehadiran Karyawan - Juli 2025</h2>
+        <h2>Data Kehadiran Karyawan - {{ \Carbon\Carbon::parse($employees[0]->TANGGAL)->format('F') }} {{ \Carbon\Carbon::parse($employees[0]->TANGGAL)->format('Y') }}</h2>
+
     </div>
 
     <div class="table-container">
