@@ -21,15 +21,14 @@ $lastDate = 0;
     <style>
         @page { 
             size: 13in 8.5in;
-            margin: 20px;
+            margin: 10px;
+            orientation: landscape;
             /* margin: 20px; margin-top: 40;  */
         }
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             font-size: 12px;
-            width: 13in;
-            height: 8.5in;
         }
         
         .header {
@@ -144,7 +143,7 @@ $lastDate = 0;
             @endphp
         @endif
         @for($head = 0; $head < count($employeeGroup); $head++)
-            @if($deptBefore != $employeeGroup[$head]->DEPARTEMENT)
+            @if($deptBefore != $employeeGroup[$head]->KODE_BAGIAN)
                 <tr>
                     <th>Dept</th>
                     <th>NPK</th>
@@ -155,12 +154,12 @@ $lastDate = 0;
                     <th>Keterangan</th>
                 </tr>
                 @php
-                    $deptBefore = $employeeGroup[$head]->DEPARTEMENT;
+                    $deptBefore = $employeeGroup[$head]->KODE_BAGIAN;
                 @endphp
             @endif
             <tr>
                 <td>
-                    {{ $employeeGroup[$head]->DEPARTEMENT }}
+                    {{ $employeeGroup[$head]->SUBDIVISI }}
                 </td>
                 <td>
                     {{ $employeeGroup[$head]->NPK }}
@@ -170,20 +169,31 @@ $lastDate = 0;
                 </td>
                     @for($i = 0; $i < count($employees); $i++)
                     <!-- NPK Sama -->
-                        @if($employeeGroup[$head]->NPK == $employees[$i]->NPK)
+                        
+                        @if($employeeGroup[$head]->NPK == $employees[$i]->NPK && $employeeGroup[$head]->KODE_BAGIAN == $employees[$i]->KODE_BAGIAN && $employeeGroup[$head]->SUBDIVISI == $employees[$i]->SUBDIVISI)
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
-                                <td>-<br> {{$loopDays}}</td>
+                                <td>-<br> - </td>
                             @endfor
                             <!-- Tanggal null -->
                             @if($employees[$i]->TANGGAL == null || (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == $getTotalDays)
                                 @php
                                     $loopDays = $getTotalDays;
                                 @endphp
-                                <td>{{'-'}} <br> {{$loopDays}}</td>
+                                <td>{{'-'}} <br> {{'-'}}</td>
                             @else
                             <!-- Ada tanggal -->
-                                <td>{{$employees[$i]->JAM_PAGI ?? '-'}} <br> {{$loopDays}} isi</td>
+                            <td><div class="mb-2">
+                                {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                            </div>
+                                <div class="mb-2">
+                                    {{$employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : ($employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : '-')}}
+                                </div>
+                                <div>
+                                    {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null) ? 'MSK' : 'LBR')}}
+                                </div>
+                            </td>
+
                             @endif
                             @php
                                 $loopDays++;
@@ -200,7 +210,7 @@ $lastDate = 0;
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
                         <td>-</td>
                     @endfor
-                    <td>Keterangan</td>
+                    <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
             </tr>
         @endfor
         </table>
