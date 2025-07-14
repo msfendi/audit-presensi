@@ -54,14 +54,14 @@ $lastDate = 0;
         }
         
         th, td {
-            border: 1px solid #333;
+            border: 1px solid black;
             padding: 3px;
             text-align: center;
             vertical-align: middle;
         }
         
         th {
-            background-color: #333;
+            background-color: black;
             color: white;
             font-weight: bold;
             font-size: 11px;
@@ -131,20 +131,22 @@ $lastDate = 0;
     </style>
 </head>
 <body>
+    {{-- @php
+        dd($employees[300]->TANGGAL);
+    @endphp --}}
     <div class="header">
-        <h2>Data Kehadiran Karyawan - {{ \Carbon\Carbon::parse($employees[0]->TANGGAL)->format('F') }} {{ \Carbon\Carbon::parse($employees[0]->TANGGAL)->format('Y') }}</h2>
-
+        <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[300]->TANGGAL)->format('F Y')}}</h2>
     </div>
 
     <div class="table-container">
         <table>
         @if($getTotalDays == null)
             @php
-                $getTotalDays = \Carbon\Carbon::now()->month(\Carbon\Carbon::parse($employees[0]->TANGGAL)->format('m'))->daysInMonth;
+                $getTotalDays = \Carbon\Carbon::parse($employees[300]->TANGGAL)->daysInMonth;
             @endphp
         @endif
         @for($head = 0; $head < count($employeeGroup); $head++)
-            @if($deptBefore != $employeeGroup[$head]->DEPARTEMENT)
+            @if($deptBefore != $employeeGroup[$head]->SUBDIVISI)
                 <tr>
                     <th>Dept</th>
                     <th>NPK</th>
@@ -155,14 +157,14 @@ $lastDate = 0;
                     <th>Keterangan</th>
                 </tr>
                 @php
-                    $deptBefore = $employeeGroup[$head]->DEPARTEMENT;
+                    $deptBefore = $employeeGroup[$head]->SUBDIVISI;
                 @endphp
             @endif
             <tr>
                 <td>
-                    {{ $employeeGroup[$head]->DEPARTEMENT }}
+                    {{ $employeeGroup[$head]->SUBDIVISI }}
                 </td>
-                <td>
+                <td>    
                     {{ $employeeGroup[$head]->NPK }}
                 </td>
                 <td>
@@ -173,17 +175,27 @@ $lastDate = 0;
                         @if($employeeGroup[$head]->NPK == $employees[$i]->NPK)
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
-                                <td>-<br> {{$loopDays}}</td>
+                                <td>-<br> - <br> MA</td>
                             @endfor
                             <!-- Tanggal null -->
-                            @if($employees[$i]->TANGGAL == null || (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == $getTotalDays)
+                            @if($employees[$i]->TANGGAL == null)
                                 @php
                                     $loopDays = $getTotalDays;
                                 @endphp
-                                <td>{{'-'}} <br> {{$loopDays}}</td>
+                                <td>{{'-'}} <br> {{'-'}} <br> MA</td>
                             @else
                             <!-- Ada tanggal -->
-                                <td>{{$employees[$i]->JAM_PAGI ?? '-'}} <br> {{$loopDays}} isi</td>
+                            <td><div class="mb-2">
+                                {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                            </div>
+                                <div class="mb-2">
+                                    {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                                </div>
+                                <div>
+                                    {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null) ? 'MSK' : 'LBR')}}
+                                </div>
+                            </td>
+
                             @endif
                             @php
                                 $loopDays++;
@@ -198,9 +210,9 @@ $lastDate = 0;
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                        <td>-</td>
+                        <td>{{'-'}} <br> {{'-'}} <br> MA</td>
                     @endfor
-                    <td>Keterangan</td>
+                    <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
             </tr>
         @endfor
         </table>
