@@ -95,10 +95,7 @@ class TemplateController extends Controller
         // $employees = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.BAG', 'BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA.NPK', '=', 'AUDIT.NPK')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%")->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->orderBy('AUDIT.TANGGAL', 'ASC')->get();
         $employees = $employeesChutex->union($employeesOut)->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->orderBy('TANGGAL', 'ASC')->get();
 
-        // dd($employees);
-
-        // $pdf = Pdf::loadView('/template/report2', compact('employees', 'employeeGroup'));
-        // return $pdf->download('Data Absen.pdf');
+        // dd($employeesChutex->get());
         return view('template.report2', compact('employees', 'employeeGroup'));
     }
-}
+
