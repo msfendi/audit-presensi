@@ -81,18 +81,17 @@ return [
         // 'sqlsrv' => [
         //     'driver' => 'sqlsrv',
         //     'url' => env('DATABASE_URL'),
-        //     'host' => env('DB_LOCAL_HOST', 'localhost'),
-        //     'port' => env('DB_LOCAL_PORT', '1433'),
-        //     'database' => env('DB_LOCAL_DATABASE', 'forge'),
-        //     'username' => env('DB_LOCAL_USERNAME', 'forge'),
-        //     'password' => env('DB_LOCAL_PASSWORD', ''),
+        //     'host' => env('DB_HOST', 'localhost'),
+        //     'port' => env('DB_PORT', '1433'),
+        //     'database' => env('DB_DATABASE', 'forge'),
+        //     'username' => env('DB_USERNAME', 'forge'),
+        //     'password' => env('DB_PASSWORD', ''),
         //     'charset' => 'utf8',
         //     'prefix' => '',
         //     'prefix_indexes' => true,
-        //     'encrypt' => env('DB_ENCRYPT', 'yes'),
-        //     'trust_server_certificate' => true,
+        //     // 'encrypt' => env('DB_ENCRYPT', 'yes'),
+        //     // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         // ],
-
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',

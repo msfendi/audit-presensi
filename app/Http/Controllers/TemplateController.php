@@ -61,19 +61,13 @@ class TemplateController extends Controller
 
     public function auditsewing()
     {
-        $employeeGroupChutex = DB::connection('sqlsrv')->table('AUDIT')->select('AUDIT.NPK', 'AUDIT.NAMA_KARYAWAN', 'AUDIT.SUBDIVISI')->distinct('AUDIT.NPK')->where('AUDIT.SUBDIVISI', 'LIKE', "%LINE%");
-        // $employeeGroupOut = DB::connection('sqlsrv')->table('AUDIT')->select('AUDIT.NPK', 'AUDIT.NAMA_KARYAWAN', 'AUDIT.SUBDIVISI')->where('AUDIT.SUBDIVISI', 'LIKE', "%LINE%");
-        // $employeeGroupJp = DB::connection('sqlsrv')->table('BIODATA_JP')->select('BIODATA_JP.ID_DEPT', 'BIODATA_JP.NPK', 'BIODATA_JP.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT')->leftJoin('DEPT', 'BIODATA_JP.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'LIKE', "%LINE%");
-        $employeeGroup = $employeeGroupChutex->orderBy('SUBDIVISI', 'ASC')->orderBy('NPK', 'ASC')->get();
-        // $employeeGroup = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.BAG', 'BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%")->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->get();
+        $employeeGroupChutex = DB::connection('sqlsrv')->table('AUDIT')->select('NPK', 'KODE_BAGIAN', 'SUBDIVISI')->distinct('NPK','KODE_BAGIAN', 'SUBDIVISI')->where('SUBDIVISI', 'LIKE', "%LINE%");
+        $employeeGroup = $employeeGroupChutex->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->get();
 
-        $employeesChutex = DB::connection('sqlsrv')->table('AUDIT')->select('BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'AUDIT.KODE_BAGIAN', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('BIODATA', 'AUDIT.NPK', '=', 'BIODATA.NPK')->where('AUDIT.SUBDIVISI', 'LIKE', "%LINE%");
-        $employeesOut = DB::connection('sqlsrv')->table('AUDIT')->select('BIODATA_KELUAR.NPK', 'BIODATA_KELUAR.NAMA_KARYAWAN', 'AUDIT.KODE_BAGIAN', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('BIODATA_KELUAR', 'AUDIT.NPK', '=', 'BIODATA_KELUAR.NPK')->where('AUDIT.SUBDIVISI', 'LIKE', "%LINE%");
-        // $employeesJP = DB::connection('sqlsrv')->table('BIODATA_JP')->select('BIODATA_JP.ID_DEPT', 'BIODATA_JP.NPK', 'BIODATA_JP.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA_JP.NPK', '=', 'AUDIT.NPK')->leftJoin('DEPT', 'BIODATA_JP.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'LIKE', "%LINE%");
-        // $employees = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.BAG', 'BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA.NPK', '=', 'AUDIT.NPK')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%")->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->orderBy('AUDIT.TANGGAL', 'ASC')->get();
-        $employees = $employeesChutex->union($employeesOut)->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->orderBy('TANGGAL', 'ASC')->get();
+        $employeesChutex = DB::connection('sqlsrv')->table('AUDIT')->select('NPK', 'NAMA_KARYAWAN', 'KODE_BAGIAN', 'SUBDIVISI', 'TANGGAL', 'JAM_PAGI', 'JAM_SIANG', 'JAM_MALAM', 'STATUS AS KETERANGAN')->where('SUBDIVISI', 'LIKE', "%LINE%");
+        $employees = $employeesChutex->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->orderBy('TANGGAL', 'ASC')->get();
 
-        // dd($employees);
+        // dd($employees);  
 
         // $pdf = Pdf::loadView('/template/report2', compact('employees', 'employeeGroup'));
         // return $pdf->download('Data Absen.pdf');
@@ -82,20 +76,14 @@ class TemplateController extends Controller
 
     public function auditnonsewing()
     {
-        // $employeeGroupChutex = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.ID_DEPT', 'BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%");
-        $employeeGroupChutex = DB::connection('sqlsrv')->table('AUDIT')->select('AUDIT.NPK', 'AUDIT.NAMA_KARYAWAN', 'AUDIT.SUBDIVISI')->distinct('AUDIT.NPK')->where('AUDIT.SUBDIVISI', 'NOT LIKE', "%LINE%");
-        // $employeeGroupOut = DB::connection('sqlsrv')->table('AUDIT')->select('AUDIT.NPK', 'AUDIT.NAMA_KARYAWAN', 'AUDIT.SUBDIVIS')->where('AUDIT.SUBDIVISI', 'NOT LIKE', "%LINE%");
-        // $employeeGroupJp = DB::connection('sqlsrv')->table('BIODATA_JP')->select('BIODATA_JP.ID_DEPT', 'BIODATA_JP.NPK', 'BIODATA_JP.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT')->leftJoin('DEPT', 'BIODATA_JP.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%");
-        $employeeGroup = $employeeGroupChutex->orderBy('SUBDIVISI', 'ASC')->orderBy('NPK', 'ASC')->get();
-        // $employeeGroup = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.BAG', 'BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%")->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->get();
+        $employeeGroupChutex = DB::connection('sqlsrv')->table('AUDIT')->select('NPK', 'KODE_BAGIAN', 'SUBDIVISI')->distinct('NPK','KODE_BAGIAN', 'SUBDIVISI')->where('SUBDIVISI', 'NOT LIKE', "%LINE%");
+        $employeeGroup = $employeeGroupChutex->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->get();
 
-        $employeesChutex = DB::connection('sqlsrv')->table('AUDIT')->select('BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'AUDIT.TANGGAL', 'AUDIT.KODE_BAGIAN', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('BIODATA', 'AUDIT.NPK', '=', 'BIODATA.NPK')->where('AUDIT.SUBDIVISI', 'NOT LIKE', "%LINE%");
-        $employeesOut = DB::connection('sqlsrv')->table('AUDIT')->select('BIODATA_KELUAR.NPK', 'BIODATA_KELUAR.NAMA_KARYAWAN', 'AUDIT.TANGGAL', 'AUDIT.KODE_BAGIAN', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('BIODATA_KELUAR', 'AUDIT.NPK', '=', 'BIODATA_KELUAR.NPK')->where('AUDIT.SUBDIVISI', 'NOT LIKE', "%LINE%");
-        // $employeesJP = DB::connection('sqlsrv')->table('BIODATA_JP')->select('BIODATA_JP.ID_DEPT', 'BIODATA_JP.NPK', 'BIODATA_JP.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA_JP.NPK', '=', 'AUDIT.NPK')->leftJoin('DEPT', 'BIODATA_JP.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%");
-        // $employees = DB::connection('sqlsrv')->table('BIODATA')->select('BIODATA.BAG', 'BIODATA.NPK', 'BIODATA.NAMA_KARYAWAN', 'DEPT.DEPARTEMENT', 'AUDIT.TANGGAL', 'AUDIT.JAM_PAGI', 'AUDIT.JAM_SIANG', 'AUDIT.JAM_MALAM', 'AUDIT.STATUS AS KETERANGAN')->leftJoin('AUDIT', 'BIODATA.NPK', '=', 'AUDIT.NPK')->leftJoin('DEPT', 'BIODATA.ID_DEPT', '=', 'DEPT.ID_DEPT')->where('DEPT.DEPARTEMENT', 'NOT LIKE', "%LINE%")->orderBy('BIODATA.ID_DEPT', 'ASC')->orderBy('BIODATA.NPK', 'ASC')->orderBy('AUDIT.TANGGAL', 'ASC')->get();
-        $employees = $employeesChutex->union($employeesOut)->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->orderBy('TANGGAL', 'ASC')->get();
+        $employeesChutex = DB::connection('sqlsrv')->table('AUDIT')->select('NPK', 'NAMA_KARYAWAN', 'KODE_BAGIAN', 'SUBDIVISI', 'TANGGAL', 'JAM_PAGI', 'JAM_SIANG', 'JAM_MALAM', 'STATUS AS KETERANGAN')->where('SUBDIVISI', 'NOT LIKE', "%LINE%");
+        $employees = $employeesChutex->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->orderBy('TANGGAL', 'ASC')->get();
 
         // dd($employeesChutex->get());
         return view('template.report2', compact('employees', 'employeeGroup'));
     }
+
 }

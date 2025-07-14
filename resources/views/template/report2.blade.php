@@ -8,6 +8,8 @@ $deptBefore = '';
 $npkBefore = '';
 
 $getTotalDays = null;
+$getTanggal = false;
+$sameNPK = false;
 
 $loopDays = 1;
 
@@ -113,6 +115,10 @@ $lastDate = 0;
             th {
                 font-size: 9px;
                 padding: 2px;
+                background-color: black;
+                color: white;
+                font-weight: bold;
+                print-color-adjust: exact;
             }
             
             td {
@@ -131,22 +137,22 @@ $lastDate = 0;
     </style>
 </head>
 <body>
-    {{-- @php
-        dd($employees[300]->TANGGAL);
-    @endphp --}}
     <div class="header">
-        <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[300]->TANGGAL)->format('F Y')}}</h2>
+        @for($i = 0; $i < 31; $i++)
+            @if($employees[$i]->TANGGAL != null && $getTanggal == false)
+                <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('F Y')}}</h2>
+                @php
+                    $getTotalDays = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->daysInMonth;
+                    $getTanggal = true;
+                @endphp
+            @endif
+        @endfor
     </div>
 
     <div class="table-container">
         <table>
-        @if($getTotalDays == null)
-            @php
-                $getTotalDays = \Carbon\Carbon::parse($employees[300]->TANGGAL)->daysInMonth;
-            @endphp
-        @endif
         @for($head = 0; $head < count($employeeGroup); $head++)
-            @if($deptBefore != $employeeGroup[$head]->SUBDIVISI)
+            @if($deptBefore != $employeeGroup[$head]->KODE_BAGIAN)
                 <tr>
                     <th>Dept</th>
                     <th>NPK</th>
@@ -157,22 +163,27 @@ $lastDate = 0;
                     <th>Keterangan</th>
                 </tr>
                 @php
-                    $deptBefore = $employeeGroup[$head]->SUBDIVISI;
+                    $deptBefore = $employeeGroup[$head]->KODE_BAGIAN;
                 @endphp
             @endif
             <tr>
-                <td>
-                    {{ $employeeGroup[$head]->SUBDIVISI }}
-                </td>
-                <td>    
-                    {{ $employeeGroup[$head]->NPK }}
-                </td>
-                <td>
-                    {{ $employeeGroup[$head]->NAMA_KARYAWAN }}
-                </td>
                     @for($i = 0; $i < count($employees); $i++)
                     <!-- NPK Sama -->
                         @if($employeeGroup[$head]->NPK == $employees[$i]->NPK)
+                            @if($sameNPK == false)
+                                <td>
+                                    {{ $employees[$i]->SUBDIVISI }}
+                                </td>
+                                <td>    
+                                    {{ $employees[$i]->NPK }}
+                                </td>
+                                <td>
+                                    {{ $employees[$i]->NAMA_KARYAWAN }}
+                                </td>
+                                @php
+                                    $sameNPK = true;
+                                @endphp
+                            @endif
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
                                 <td>-<br> - <br> MA</td>
@@ -213,6 +224,9 @@ $lastDate = 0;
                         <td>{{'-'}} <br> {{'-'}} <br> MA</td>
                     @endfor
                     <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
+                    @php
+                        $sameNPK = false;
+                    @endphp
             </tr>
         @endfor
         </table>
