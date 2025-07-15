@@ -15,6 +15,9 @@ $loopDays = 1;
 
 $lastDate = 0;
 
+$mayDate = [1,2,5,6,7,8,9];
+
+
 @endphp
 <head>
     <meta charset="UTF-8">
@@ -186,15 +189,25 @@ $lastDate = 0;
                             @endif
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
-                                <td>-<br> - <br> MA</td>
+                                @if($loopDays == 1 || $loopDays == 7 || $loopDays == 8 || $loopDays == 14 || $loopDays == 15 || $loopDays == 21 || $loopDays == 22 ||  $loopDays == 28 || $loopDays == 29)
+                                    <td>-<br> - <br> LBR</td>
+                                @else
+                                    {{-- @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
+                                        <td>-<br> - <br> LBR</td>
+                                    @else --}}
+                                        <td>-<br> - <br> MA </td>
+                                    {{-- @endif --}}
+                                @endif
                             @endfor
+
                             <!-- Tanggal null -->
                             @if($employees[$i]->TANGGAL == null)
                                 @php
                                     $loopDays = $getTotalDays;
                                 @endphp
-                                <td>{{'-'}} <br> {{'-'}} <br> MA</td>
+                                <td>{{'-'}} <br> {{'-'}} <br> MA</td> {{-- Not execute --}}
                             @else
+                            
                             <!-- Ada tanggal -->
                             <td><div class="mb-2">
                                 {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
@@ -202,9 +215,24 @@ $lastDate = 0;
                                 <div class="mb-2">
                                     {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
                                 </div>
-                                <div>
-                                    {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null) ? 'MSK' : 'LBR')}}
-                                </div>
+
+                                @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null))
+                                    <div class="mb-2">
+                                        MSK
+                                    </div>
+                                @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend()))
+                                    <div class="mb-2">
+                                        LBR
+                                    </div>
+                                @elseif(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '6' || Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '27')
+                                    <div class="mb-2">
+                                        {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null ? 'MSK' : 'LBR'}}
+                                    </div>
+                                @else
+                                    <div>
+                                        {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
+                                    </div>
+                                @endif
                             </td>
 
                             @endif
@@ -221,7 +249,12 @@ $lastDate = 0;
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                        <td>{{'-'}} <br> {{'-'}} <br> MA</td>
+                    @if($sisa == 16 || $sisa == 17 || $sisa == 23 || $sisa == 24 || $sisa == 28 || $sisa == 30)
+                        <td> - <br> LBR</td>
+                    @else
+                        <td>-<br> - <br> MA </td>
+                    @endif
+                        {{-- <td>{{'-'}} <br> {{'-'}} <br> MA <br>{{$sisa}}</td> --}}
                     @endfor
                     <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
                     @php
