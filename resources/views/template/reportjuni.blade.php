@@ -189,14 +189,14 @@ $mayDate = [1,2,5,6,7,8,9];
                             @endif
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
-                                @if($loopDays == 3 || $loopDays == 4 || $loopDays == 10 || $loopDays == 11 || $loopDays == 12)
+                                @if($loopDays == 1 || $loopDays == 7 || $loopDays == 8 || $loopDays == 14 || $loopDays == 15 || $loopDays == 21 || $loopDays == 22 ||  $loopDays == 28 || $loopDays == 29)
                                     <td>-<br> - <br> LBR</td>
                                 @else
-                                    @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
+                                    {{-- @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
                                         <td>-<br> - <br> LBR</td>
-                                    @else
+                                    @else --}}
                                         <td>-<br> - <br> MA </td>
-                                    @endif
+                                    {{-- @endif --}}
                                 @endif
                             @endfor
 
@@ -224,13 +224,13 @@ $mayDate = [1,2,5,6,7,8,9];
                                     <div class="mb-2">
                                         LBR
                                     </div>
-                                @elseif(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '29' || Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '12')
+                                @elseif(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '6' || Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '27')
                                     <div class="mb-2">
                                         {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null ? 'MSK' : 'LBR'}}
                                     </div>
                                 @else
                                     <div>
-                                        {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
+                                        {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
                                     </div>
                                 @endif
                             </td>
