@@ -189,7 +189,7 @@ $mayDate = [1,2,5,6,7,8,9];
                             @endif
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
-                                @if($loopDays == 1 || $loopDays == 7 || $loopDays == 8 || $loopDays == 14 || $loopDays == 15 || $loopDays == 21 || $loopDays == 22 ||  $loopDays == 28 || $loopDays == 29)
+                                @if($loopDays == 1 ||  $loopDays == 6 || $loopDays == 7 || $loopDays == 8 || $loopDays == 14 || $loopDays == 15 || $loopDays == 21 || $loopDays == 22 || $loopDays == 27 || $loopDays == 28 || $loopDays == 29)
                                     <td>-<br> - <br> LBR</td>
                                 @else
                                     {{-- @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
@@ -216,7 +216,7 @@ $mayDate = [1,2,5,6,7,8,9];
                                     {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
                                 </div>
 
-                                @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null))
+                                @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
                                     <div class="mb-2">
                                         MSK
                                     </div>
@@ -226,7 +226,7 @@ $mayDate = [1,2,5,6,7,8,9];
                                     </div>
                                 @elseif(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '6' || Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '27')
                                     <div class="mb-2">
-                                        {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null ? 'MSK' : 'LBR'}}
+                                        {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
                                     </div>
                                 @else
                                     <div>
@@ -249,10 +249,10 @@ $mayDate = [1,2,5,6,7,8,9];
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                    @if($sisa == 16 || $sisa == 17 || $sisa == 23 || $sisa == 24 || $sisa == 28 || $sisa == 30)
+                    @if($sisa == 20 || $sisa == 21 || $sisa == 26 || $sisa == 27 || $sisa == 28)
                         <td> - <br> LBR</td>
                     @else
-                        <td>-<br> - <br> MA </td>
+                        <td>-<br> - <br> MA</td>
                     @endif
                         {{-- <td>{{'-'}} <br> {{'-'}} <br> MA <br>{{$sisa}}</td> --}}
                     @endfor

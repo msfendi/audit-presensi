@@ -84,5 +84,44 @@ class TemplateController extends Controller
 
         // dd($employeesChutex->get());
         return view('template.report2', compact('employees', 'employeeGroup'));
+
+
+
+
+
+        
+
+        // ini_set('memory_limit', '512M');
+        // ini_set('max_execution_time', 600);
+
+        // $chunkSize = 1000; // Process 1000 records at a time
+        // $employees = collect();
+
+        // $baseQuery = DB::connection('sqlsrv')->table('AUDIT')->where('SUBDIVISI', 'NOT LIKE', "%LINE%");
+
+        // // if ($request->department === 'sewing') {
+        // //     $baseQuery->where('SUBDIVISI', 'LIKE', "%LINE%");
+        // // } else {
+        // //     $baseQuery->where('SUBDIVISI', 'NOT LIKE', "%LINE%");
+        // // }
+
+        // // Process data in chunks
+        // $baseQuery->clone()
+        //     ->select('NPK', 'NAMA_KARYAWAN', 'KODE_BAGIAN', 'SUBDIVISI', 'TANGGAL', 'JAM_PAGI', 'JAM_SIANG', 'JAM_MALAM', 'STATUS AS KETERANGAN')
+        //     ->orderBy('KODE_BAGIAN', 'ASC')
+        //     ->orderBy('NPK', 'ASC')
+        //     ->orderBy('TANGGAL', 'ASC')
+        //     ->chunk($chunkSize, function ($employeesy) use (&$employees) {
+        //         $employees = $employees->concat($employeesy);
+        //     });
+
+        // $employeeGroup = $baseQuery->clone()
+        //     ->select('NPK', 'KODE_BAGIAN', 'SUBDIVISI')
+        //     ->distinct()
+        //     ->orderBy('KODE_BAGIAN', 'ASC')
+        //     ->orderBy('NPK', 'ASC')
+        //     ->get();
+
+        // return view('template.report2', compact('employees', 'employeeGroup'));
     }
 }

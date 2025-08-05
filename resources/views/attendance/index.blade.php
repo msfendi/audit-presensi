@@ -45,24 +45,35 @@
                     <div class="card-body">
                         <form method="post" action="{{ route('attendance.export') }}" enctype="multipart/form-data">
                             <div class="row">
-                                <div class="col-xl-4 col-md-6">
+                                <div class="col-xl-3 col-md-6">
                                     <div>
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <label>From Date :</label>
                                         <input class="date form-control" type="date" id="fromdate" name="fromdate" value="">
                                     </div>
                                 </div>
-                                <div class="col-xl-4 col-md-6">
+                                <div class="col-xl-3 col-md-6">
                                     <div>
                                         <label>To Date :</label>
                                         <input class="date form-control" type="date" id="todate" name="todate" value="">
                                     </div>
                                 </div>
-                                <div class="col-xl-4 col-md-6 mt-2">
+                                <div class="col-xl-3 col-md-6">
+                                    <div>
+                                        <label>Department</label>
+                                        <select name="department" id="department" class="form-control">
+                                            <option disabled selected>Select Department</option>
+                                            <option value="sewing">Sewing</option>
+                                            <option value="nonsewing">Non Sewing</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-md-6 mt-2">
                                     <br>
                                     <div>
                                         <button id='filter-data' type="button" class="btn btn-primary">Filter</button>
-                                        <button id='export' type="submit" class="btn btn-success">Export To PDF</button>
+                                        <button id='sewing' type="button" class="btn btn-info">Sewing</button>
+                                        <button id='nonsewing' type="button" class="btn btn-warning">Non Sewing</button>
                                     </div>
                                 </div>
                             </div>
@@ -86,7 +97,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($unionEmployees as $employee)
+                                    @foreach($employees as $employee)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $employee->NPK }}</td>
@@ -258,5 +269,30 @@
     //         },
     //     })
     // });
+
+    $('#sewing').on('click', function () {
+        const url = "{{ route('attendance.auditsewing') }}";
+        window.open(url, '_blank');
+    });
+
+    $('#nonsewing').on('click', function () {
+        // const url = "{{ route('attendance.auditnonsewing') }}";
+        // window.open(url, '_blank');
+        $.ajax({
+            url: "{{ route('attendance.auditnonsewing') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                fromdate: $('#fromdate').val(),
+                todate: $('#todate').val(),
+            },
+            success: function(response) {
+                console.log("Success:", response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    });
 </script>
 </html>

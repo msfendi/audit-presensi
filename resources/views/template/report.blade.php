@@ -4,16 +4,37 @@
 $keterangan = '-';
 $jamMasuk = '-';
 $jamPulang = '-';
+$deptBefore = '';
+$npkBefore = '';
+
+$getTotalDays = null;
+$getTanggal = false;
+$sameNPK = false;
+
+$loopDays = 1;
+
+$lastDate = 0;
+
+$mayDate = [1,2,5,6,7,8,9];
+
+
 @endphp
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Kehadiran Karyawan</title>
     <style>
+        /* @page { 
+            size: 13in 8.5in;
+            margin: 20px;
+        } */
+            /* margin: 20px; margin-top: 40;  */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             font-size: 12px;
+            /* width: 13in;
+            height: 8.5in; */
         }
         
         .header {
@@ -38,14 +59,14 @@ $jamPulang = '-';
         }
         
         th, td {
-            border: 1px solid #333;
+            border: 1px solid black;
             padding: 3px;
             text-align: center;
             vertical-align: middle;
         }
         
         th {
-            background-color: #333;
+            background-color: black;
             color: white;
             font-weight: bold;
             font-size: 11px;
@@ -97,6 +118,10 @@ $jamPulang = '-';
             th {
                 font-size: 9px;
                 padding: 2px;
+                background-color: black;
+                color: white;
+                font-weight: bold;
+                print-color-adjust: exact;
             }
             
             td {
@@ -116,84 +141,128 @@ $jamPulang = '-';
 </head>
 <body>
     <div class="header">
-        <h2>Data Kehadiran Karyawan - Juli 2025</h2>
+        @for($i = 0; $i < 31; $i++)
+            @if($employees[$i]->TANGGAL != null && $getTanggal == false)
+                <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('F Y')}}</h2>
+                @php
+                    $getTotalDays = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->daysInMonth;
+                    $getTanggal = true;
+                @endphp
+            @endif
+        @endfor
     </div>
 
     <div class="table-container">
-        @foreach($groupedByBag as $bagian => $bagianCollection)
-            <table>
-                <thead>
-                    @php
-                        $startOfMonth = \Carbon\Carbon::parse($groupedByTanggal->first()[0]->TANGGAL)->startOfMonth()->format('d');
-                        $endOfMonth = \Carbon\Carbon::parse($groupedByTanggal->first()[0]->TANGGAL)->endOfMonth()->format('d');
-                    @endphp
-                    <tr>
-                        <th></th>
-                        <th>NPK</th>
-                        <th >Nama Karyawan</th>
-                        <!-- Loop tanggal 1-31 -->
-                        @for($date = $startOfMonth; $date <= $endOfMonth; $date++)
-                            <th>{{ $date }}</th>
-                        @endfor
-                        <th>Keterangan</th>
-                    </tr>
-                </thead>    
-                <tbody>
-                    @foreach($groupedByNPK as $npk => $npkCollection)
-                        @if($bagian == $npkCollection[0]->BAG)
-                            <tr>
-                                <td style="width: 100px;">{{ $npkCollection[0]->BAG }}</td>
-                                <td>{{ $npkCollection[0]->NPK }}</td>
-                                <td style="width: 100px;">{{ $npkCollection[0]->NAMA_KARYAWAN }}</td>
-
-                                @for($date = $startOfMonth; $date <= $endOfMonth; $date++)
-                                    <td>
-                                    @foreach($groupedByTanggal as $dateCollection => $dateArray) 
-                                        @for($i = 0; $i < count($dateArray); $i++)
-                                            @if($date == \Carbon\Carbon::parse($dateArray[$i]->TANGGAL)->format('d') && $dateArray[$i]->NPK == $npk)
-                                                @php
-                                                    $keterangan = $dateArray[$i]->KETERANGAN;
-                                                    $jamMasuk = $dateArray[$i]->JAM_PAGI;
-                                                    $jamPulang = $dateArray[$i]->JAM_SIANG;
-                                                @endphp
-                                            @endif
-                                        @endfor
-                                    @endforeach
-                                        <div class="status">
-                                            {{ $keterangan }}
-                                        </div>
-                                        <div class="status">
-                                            {{ $jamMasuk }}
-                                        </div>
-                                        <div class="status">
-                                            {{ $jamPulang }}
-                                        </div>
-                                        @php
-                                            $keterangan = '-';
-                                            $jamMasuk = '-';
-                                            $jamPulang = '-';
-                                        @endphp
-                                    </td>
-                                @endfor
+        <table>
+        @for($head = 0; $head < count($employeeGroup); $head++)
+            @if($deptBefore != $employeeGroup[$head]->KODE_BAGIAN)
+                <tr>
+                    <th>Dept</th>
+                    <th>NPK</th>
+                    <th >Nama Karyawan</th>
+                    @for($date = 1; $date <= $getTotalDays; $date++)
+                        <th>{{ $date }}</th>
+                    @endfor
+                    <th>Keterangan</th>
+                </tr>
+                @php
+                    $deptBefore = $employeeGroup[$head]->KODE_BAGIAN;
+                @endphp
+            @endif
+            <tr>
+                    @for($i = 0; $i < count($employees); $i++)
+                    <!-- NPK Sama -->
+                        @if($employeeGroup[$head]->NPK == $employees[$i]->NPK)
+                            @if($sameNPK == false)
                                 <td>
-                                    <div class="status">
-                                        {{ 'Status' }}
-                                    </div>
-                                    <div class="status">
-                                        {{ 'Jam Datang' }}
-                                    </div>
-                                    <div class="status">
-                                        {{ 'Jam Pulang' }}
-                                    </div>
+                                    {{ $employees[$i]->SUBDIVISI }}
                                 </td>
-                            </tr>
+                                <td>    
+                                    {{ $employees[$i]->NPK }}
+                                </td>
+                                <td>
+                                    {{ $employees[$i]->NAMA_KARYAWAN }}
+                                </td>
+                                @php
+                                    $sameNPK = true;
+                                @endphp
+                            @endif
+                            @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
+                                <!-- Tidak ada absen -->
+                                @if($loopDays == 1 ||  $loopDays == 6 || $loopDays == 7 || $loopDays == 8 || $loopDays == 14 || $loopDays == 15 || $loopDays == 21 || $loopDays == 22 || $loopDays == 27 || $loopDays == 28 || $loopDays == 29)
+                                    <td>-<br> - <br> LBR</td>
+                                @else
+                                    {{-- @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
+                                        <td>-<br> - <br> LBR</td>
+                                    @else --}}
+                                        <td>-<br> - <br> MA </td>
+                                    {{-- @endif --}}
+                                @endif
+                            @endfor
+
+                            <!-- Tanggal null -->
+                            @if($employees[$i]->TANGGAL == null)
+                                @php
+                                    $loopDays = $getTotalDays;
+                                @endphp
+                                <td>{{'-'}} <br> {{'-'}} <br> MA</td> {{-- Not execute --}}
+                            @else
+                            
+                            <!-- Ada tanggal -->
+                            <td><div class="mb-2">
+                                {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                            </div>
+                                <div class="mb-2">
+                                    {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                                </div>
+
+                                @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
+                                    <div class="mb-2">
+                                        MSK
+                                    </div>
+                                @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend()))
+                                    <div class="mb-2">
+                                        LBR
+                                    </div>
+                                @elseif(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '6' || Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '27')
+                                    <div class="mb-2">
+                                        {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
+                                    </div>
+                                @else
+                                    <div>
+                                        {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
+                                    </div>
+                                @endif
+                            </td>
+
+                            @endif
+                            @php
+                                $loopDays++;
+                                $lastDate = (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');
+                            @endphp
+                            
+                        @else
+                        <!-- Beda NPK -->
+                        @php
+                            $loopDays = 1;
+                        @endphp
                         @endif
-                    @endforeach
-                </tbody>
-            </table>
-            <br>
-            <br>
-        @endforeach
+                    @endfor
+                    @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
+                    @if($sisa == 20 || $sisa == 21 || $sisa == 26 || $sisa == 27 || $sisa == 28)
+                        <td> - <br> LBR</td>
+                    @else
+                        <td>-<br> - <br> MA</td>
+                    @endif
+                        {{-- <td>{{'-'}} <br> {{'-'}} <br> MA <br>{{$sisa}}</td> --}}
+                    @endfor
+                    <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
+                    @php
+                        $sameNPK = false;
+                    @endphp
+            </tr>
+        @endfor
+        </table>
     </div>
 </body>
-</html>22:00 7/8/202522:49 7/8/2025
+</html>
