@@ -78,36 +78,36 @@ return [
             'sslmode' => 'prefer',
         ],
 
-        // 'sqlsrv' => [
-        //     'driver' => 'sqlsrv',
-        //     'url' => env('DATABASE_URL'),
-        //     'host' => env('DB_LOCAL_HOST', 'localhost'),
-        //     'port' => env('DB_LOCAL_PORT', '1433'),
-        //     'database' => env('DB_LOCAL_DATABASE', 'forge'),
-        //     'username' => env('DB_LOCAL_USERNAME', 'forge'),
-        //     'password' => env('DB_LOCAL_PASSWORD', ''),
-        //     'charset' => 'utf8',
-        //     'prefix' => '',
-        //     'prefix_indexes' => true,
-        //     'encrypt' => env('DB_ENCRYPT', 'yes'),
-        //     'trust_server_certificate' => true,
-        // ],
-
-
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_EXT_HOST', 'localhost'),
-            'port' => env('DB_EXT_PORT', '1433'),
-            'database' => env('DB_EXT_DATABASE', 'forge'),
-            'username' => env('DB_EXT_USERNAME', 'forge'),
-            'password' => env('DB_EXT_PASSWORD', ''),
+            'host' => env('DB_LOCAL_HOST', 'localhost'),
+            'port' => env('DB_LOCAL_PORT', '1433'),
+            'database' => env('DB_LOCAL_DATABASE', 'forge'),
+            'username' => env('DB_LOCAL_USERNAME', 'forge'),
+            'password' => env('DB_LOCAL_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'encrypt' => 'yes',
-            'trust_server_certificate' => true
+            'encrypt' => env('DB_ENCRYPT', 'yes'),
+            'trust_server_certificate' => true,
         ],
+
+
+        // 'sqlsrv' => [
+        //     'driver' => 'sqlsrv',
+        //     'url' => env('DATABASE_URL'),
+        //     'host' => env('DB_EXT_HOST', 'localhost'),
+        //     'port' => env('DB_EXT_PORT', '1433'),
+        //     'database' => env('DB_EXT_DATABASE', 'forge'),
+        //     'username' => env('DB_EXT_USERNAME', 'forge'),
+        //     'password' => env('DB_EXT_PASSWORD', ''),
+        //     'charset' => 'utf8',
+        //     'prefix' => '',
+        //     'prefix_indexes' => true,
+        //     'encrypt' => 'yes',
+        //     'trust_server_certificate' => true
+        // ],
 
     ],
 

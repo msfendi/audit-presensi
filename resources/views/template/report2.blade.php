@@ -249,7 +249,7 @@ $mayDate = [1,2,5,6,7,8,9];
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                    @if($sisa == 18 || $sisa == 19 || $sisa == 25 || $sisa == 26)
+                    @if($sisa == 4 || $sisa == 5 || $sisa == 9 || $sisa == 10 || $sisa == 11 || $sisa == 12 || $sisa == 18 || $sisa == 19 || $sisa == 25 || $sisa == 26)
                         <td> - <br> LBR</td>
                     @else
                         <td>-<br> - <br> MA</td>
