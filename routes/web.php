@@ -29,11 +29,11 @@ Route::get('/template/auditsewing', [TemplateController::class, 'auditsewing'])-
 Route::get('/template/auditnonsewing', [TemplateController::class, 'auditnonsewing'])->name('template.auditnonsewing');
 
 Route::group(['middleware' => 'guest'], function () {
-    // Route::get('/register', [RegisterController::class, 'index'])->name('register');
+    Route::get('/register', [RegisterController::class, 'index'])->name('register');
     Route::post('/register/guest', [RegisterController::class, 'store'])->name('register.guest');
 
     Route::get('/login', [LoginController::class, 'login'])->name('login.guest');
-    // Route::post('/login', [LoginController::class, 'authenticate'])->name('login');
+    Route::post('/login', [LoginController::class, 'authenticate'])->name('login');
 });
 
 Route::group(['middleware' => 'auth'], function () {

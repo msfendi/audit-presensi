@@ -220,7 +220,7 @@ $mayDate = [1,2,5,6,7,8,9];
                                     <div class="mb-2">
                                         MSK
                                     </div>
-                                @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
+                                @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend()))
                                     <div class="mb-2">
                                         LBR
                                     </div>
@@ -249,7 +249,7 @@ $mayDate = [1,2,5,6,7,8,9];
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                    @if($sisa == 8 || $sisa == 9 || $sisa == 15 || $sisa == 16 || $sisa == 22 || $sisa == 23 || $sisa == 29 || $sisa == 30)
+                    @if($sisa == 22 || $sisa == 23 || $sisa == 29 || $sisa == 30)
                         <td> - <br> LBR</td>
                     @else
                         <td>-<br> - <br> MA</td>
