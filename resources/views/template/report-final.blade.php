@@ -10,6 +10,8 @@ $npkBefore = '';
 $getTotalDays = null;
 $getTanggal = false;
 $sameNPK = false;
+$year = '';
+$month = '';
 
 $loopDays = 1;
 
@@ -140,10 +142,12 @@ $lastDate = 0;
     <div class="header">
         @for($i = 0; $i < 31; $i++)
             @if($employees[$i]->TANGGAL != null && $getTanggal == false)
-                <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('F Y')}}</h2>
+                <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[0]->TANGGAL)->format('F Y')}}</h2>
                 @php
                     $getTotalDays = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->daysInMonth;
                     $getTanggal = true;
+                    $year = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('Y');
+                    $month = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('m');
                 @endphp
             @endif
         @endfor
@@ -186,13 +190,13 @@ $lastDate = 0;
                             @endif
                             @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
                                 <!-- Tidak ada absen -->
-                                @if($loopDays == 5 ||  $loopDays == 6 || $loopDays == 7 ||  $loopDays == 13 || $loopDays == 14 || $loopDays == 20 || $loopDays == 21 || $loopDays == 27 || $loopDays == 28)
-                                    <td>-<br> - <br> LBR</td>
+                                @if(in_array($loopDays, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . $loopDays)->isWeekend())
+                                    <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> LBR</td>
                                 @else
                                     {{-- @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
                                         <td>-<br> - <br> LBR</td>
                                     @else --}}
-                                        <td>-<br> - <br> MA </td>
+                                        <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA </td>
                                     {{-- @endif --}}
                                 @endif
                             @endfor
@@ -202,33 +206,35 @@ $lastDate = 0;
                                 @php
                                     $loopDays = $getTotalDays;
                                 @endphp
-                                <td>{{'-'}} <br> {{'-'}} <br> MA</td> {{-- Not execute --}}
+                                <td>{{'-'}} <br style="mso-data-placement:same-cell;" /> {{'-'}} <br style="mso-data-placement:same-cell;" /> MA</td> {{-- Not execute --}}
                             @else
                             
                             <!-- Ada tanggal -->
                             <td><div class="mb-2">
                                 {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
                             </div>
-                                <div class="mb-2">
+                            <br style="mso-data-placement:same-cell;" />
+                                {{-- <div class="mb-2"> --}}
                                     {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
-                                </div>
+                                {{-- </div> --}}
+                                <br style="mso-data-placement:same-cell;" />
 
                                 @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
-                                    <div class="mb-2">
+                                    {{-- <div class="mb-2"> --}}
                                         MSK
-                                    </div>
+                                    {{-- </div> --}}
                                 @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
-                                    <div class="mb-2">
+                                    {{-- <div class="mb-2"> --}}
                                         LBR
-                                    </div>
-                                @elseif(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == '5')
-                                    <div class="mb-2">
+                                    {{-- </div> --}}
+                                @elseif(in_array(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'), $days))
+                                    {{-- <div class="mb-2"> --}}
                                         {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
-                                    </div>
+                                    {{-- </div> --}}
                                 @else
-                                    <div>
+                                    {{-- <div> --}}
                                         {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
-                                    </div>
+                                    {{-- </div> --}}
                                 @endif
                             </td>
 
@@ -246,10 +252,11 @@ $lastDate = 0;
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                    @if($sisa == 4 || $sisa == 5 || $sisa == 6 || $sisa == 12 || $sisa == 13 || $sisa == 19 || $sisa == 20 || $sisa == 26 || $sisa == 27)
-                        <td> - <br> LBR <br></td>
+                    @if(in_array($sisa + 1, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . ($sisa + 1))->isWeekend())
+                    {{-- @if($sisa == 4 || $sisa == 5 || $sisa == 6 || $sisa == 12 || $sisa == 13 || $sisa == 19 || $sisa == 20 || $sisa == 26 || $sisa == 27) --}}
+                        <td> - <br style="mso-data-placement:same-cell;" /> LBR <br style="mso-data-placement:same-cell;" /> </td>
                     @else
-                        <td>-<br> - <br> MA <br></td>
+                        <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA <br style="mso-data-placement:same-cell;" /></td>
                     @endif
                         {{-- <td>{{'-'}} <br> {{'-'}} <br> MA <br>{{$sisa}}</td> --}}
                     @endfor

@@ -12,8 +12,10 @@ class Audit extends Model
     protected $table = 'AUDIT';
     protected $fillable = [
         'NPK',
+        'NAMA_KARYAWAN',
         'TANGGAL',
         'SUBDIVISI',
+        'KODE_BAGIAN',
         'JAM_PAGI',
         'JAM_SIANG',
         'JAM_MALAM',

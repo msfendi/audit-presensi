@@ -36,13 +36,14 @@ class AttendanceImport implements ToModel, WithStartRow
 
         return new Audit([
             'NPK' => $row[3],
+            'NAMA_KARYAWAN' => $row[2],
             'TANGGAL' => Carbon::parse(Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[1])))->format('Y-m-d'),
             'SUBDIVISI' => $row[4],
-            'JAM_PAGI' => $row[7] ?? '-',
-            'JAM_SIANG' => $row[8] ?? '-',
-            'JAM_MALAM' => $row[9] ?? '-',
-            'STATUS' => $row[10] ?? '-',
-            'VOID' => 'false'
+            'KODE_BAGIAN' => $row[5],
+            'JAM_PAGI' => $row[8] ?? null,
+            'JAM_SIANG' => $row[9] ?? null,
+            'JAM_MALAM' => $row[10] ?? null,
+            'STATUS' => $row[11] ?? null,
         ]);
     }
 }

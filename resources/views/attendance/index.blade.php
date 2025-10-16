@@ -19,13 +19,10 @@
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">Attendance List</h1>
                     <div>
-                        <form method="GET" action="" >
-                            <button id="submit" type="submit" class="btn btn-sm btn-primary shadow-s"><i
-                            class="fas fa-qrcode fa-sm text-white-50"></i> Generate QR</a></button>
                         <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#importModal"><i
                             class="fas fa-upload fa-sm text-white-50"></i> Upload Data</a>
-                        {{-- <a href="{{ route('pdf.generatePDF') }}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i
-                            class="fas fa-download fa-sm text-white-50"></i> Download Sticker A4</a> --}}
+                        <a class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#deleteModal"><i
+                            class="fas fa-trash fa-sm text-white-50"></i> Delete All Data</a>
                         </form>
                     </div>
                 </div>
@@ -58,25 +55,32 @@
                                         <input class="date form-control" type="date" id="todate" name="todate" value="">
                                     </div>
                                 </div>
-                                <div class="col-xl-3 col-md-6">
+                                <div class="col-xl-2 col-md-6">
                                     <div>
                                         <label>Department</label>
-                                        <select name="department" id="department" class="form-control">
-                                            <option disabled selected>Select Department</option>
-                                            <option value="sewing">Sewing</option>
-                                            <option value="nonsewing">Non Sewing</option>
+                                        <select class="department" id="department[]" name="department[]" multiple="multiple">
+                                            {{-- <option></option> --}}
+                                            @foreach($employeeGroupChutex as $dept)
+                                                <option value="{{ $dept->KODE_BAGIAN }}">{{ $dept->SUBDIVISI }}</option>
+                                            @endforeach
                                         </select>
+                                        <input id="select-all" type="checkbox" >Select All
                                     </div>
                                 </div>
-                                <div class="col-xl-3 col-md-6 mt-2">
-                                    <br>
+
+                                <div class="col-xl-2 w-full col-md-6">
                                     <div>
-                                        <button id='filter-data' type="button" class="btn btn-primary">Filter</button>
-                                        <button id='sewing' type="button" class="btn btn-info">Sewing</button>
-                                        <button id='nonsewing' type="button" class="btn btn-warning">Non Sewing</button>
+                                        <label>Holiday Date</label>
+                                        <input class="form-control" type="text" id="holiday_date" name="holiday_date">
                                     </div>
                                 </div>
-                            </div>
+                                <div class="col-xl-2 w-full col-md-6 mt-2">
+                                    <br>
+                                    <div class="row">
+                                        <button id='filter-data' type="button" class="btn btn-md btn-primary mr-2">Filter</button>
+                                        <button id='export-excel' type="button" class="btn btn-md btn-warning">Export Excel</button>
+                                    </div>
+                                </div>
                         </form>
                     </div>
                     <div class="card-body">
@@ -104,11 +108,14 @@
                                         <td>{{ $employee->NAMA_KARYAWAN }}</td>
                                         <td>{{ $employee->TANGGAL }}</td>
                                         <td>{{ $employee->SUBDIVISI }}</td>
-                                        <td>{{ $employee->JAM_PAGI }}</td>
-                                        <td>{{ $employee->JAM_SIANG }}</td>
-                                        <td>{{ $employee->JAM_MALAM }}</td>
-                                        <td>{{ $employee->KETERANGAN }}</td>
+                                        <td>{{ $employee->JAM_PAGI ?? '-' }}</td>
+                                        <td>{{ $employee->JAM_SIANG ?? '-' }}</td>
+                                        <td>{{ $employee->JAM_MALAM ?? '-' }}</td>
+                                        <td>{{ $employee->KETERANGAN ?? '-' }}</td>
                                         <td class="text-center">
+                                            <a class="btn btn-primary btn-circle btn-sm" href="{{ route('attendance.edit', $employee->id) }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                             @if (request()->get('void') == 'false' || request()->get('void') == '')
                                             {{-- <a class="btn btn-danger btn-circle btn-sm btn-void-record" data-void-link="{{ route('attendance.void', ['id' => $attendance->id]) }}" data-void-name="{{ $attendance->item_name }}" data-toggle="modal" data-target="#voidModal">
                                                 <i class="fas fa-ban"></i>
@@ -135,40 +142,6 @@
         <!-- End of Main Content -->
 
         <!-- Modal -->
-        <div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="attendance" >
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="pdf-title" class="modal-title" id="exampleModalLabel">Inventory QR Name</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body"><iframe id="pdf-src" src ="" width="100%" height="480px"></iframe></div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Tutup</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-md" role="attendance" >
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="delete-title" class="modal-title" id="exampleModalLabel">Delete Record</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">x</span>
-                        </button>
-                    </div>
-                    <div class="modal-body"><p id="modal-text-record"></p></div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Tutup</button>
-                        <a id="btn-confirm" href=""><button class="btn btn-primary" type="button">Confirm</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="modal fade" id="voidModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-md" role="attendance" >
                 <div class="modal-content">
@@ -224,7 +197,27 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-success">Import</button>
+                                <button type="submit" id="submit-import" class="btn btn-success">Import</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="modal-title" class="modal-title" id="exampleModalLabel">Hapus Semua Data Kehadiran</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">x</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('attendance.deleteAll') }}" method="POST">
+                        @csrf
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-danger">Hapus</button>
                             </div>
                     </form>
                 </div>
@@ -241,11 +234,11 @@
 <!-- Page level custom scripts -->
 <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> --}}
+<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" rel="stylesheet"/>
+
 <script type="text/javascript">
-    $('.btn-show-pdf').on('click', function () {
-        $('#pdf-src').attr('src', '../../storage/attendance/' + $(this).data('show-link'));
-        $("#pdf-title").text($(this).data('show-title'));
-    });
     $('.btn-delete-record').on('click', function () {
             $('#btn-confirm').attr('href', $(this).data('delete-link'));
             $("#modal-text-record").text('Apakah anda yakin ingin menghapus Inventory QR ' + $(this).data('delete-name') + '?');
@@ -258,41 +251,106 @@
             $('#btn-confirm-restore').attr('href', $(this).data('restore-link'));
             $("#modal-text-record-restore").text('Apakah anda yakin ingin mengembalikan Inventory QR ' + $(this).data('restore-name') + '?');
     });
-    // $("#submit").click(function() {
-    //     $(this).hide();
-    //     Swal.fire({
-    //         title: "Process",
-    //         html: "Generating All QR Code.. Please Wait!!",
-    //         timerProgressBar: true,
-    //         didOpen: () => {
-    //             Swal.showLoading();
-    //         },
-    //     })
-    // });
 
-    $('#sewing').on('click', function () {
-        const url = "{{ route('attendance.auditsewing') }}";
-        window.open(url, '_blank');
+    $(document).ready(function() {
+        $('.department').select2();
+        $('#holiday_date').datepicker({
+            multidate: true
+        });
+
+        $("#select-all").click(function(){
+        if($("#select-all").is(':checked')){
+            $(".department > option").prop("selected", "selected");
+            $(".department").trigger("change");
+        } else {
+            $(".department > option").removeAttr("selected");
+            $(".department").trigger("change");
+        }
+    });
     });
 
-    $('#nonsewing').on('click', function () {
-        // const url = "{{ route('attendance.auditnonsewing') }}";
-        // window.open(url, '_blank');
-        $.ajax({
-            url: "{{ route('attendance.auditnonsewing') }}",
+    $('#filter-data').on('click', function () {
+        var fromdate = $('#fromdate').val();
+        var todate = $('#todate').val();
+        var department = $('#department\\[\\]').val(); 
+        var holiday_date = $('#holiday_date').val();
+        console.log(holiday_date);
+
+        if(fromdate && todate && department) {
+            $.ajax({
+            url: "{{ route('attendance.export') }}",
             type: "POST",
             data: {
                 _token: "{{ csrf_token() }}",
-                fromdate: $('#fromdate').val(),
-                todate: $('#todate').val(),
+                fromdate: fromdate,
+                todate: todate,
+                department: department,
+                holiday_date: holiday_date
             },
             success: function(response) {
-                console.log("Success:", response);
+                console.log(response);
+                
+                var params = $.param({
+                fromdate: fromdate,
+                todate: todate,
+                department: department,
+                days: response.days // department is array, so Laravel will receive as department[]
+            });
+                window.open('/attendance/report?' + params, '_blank');
+
             },
             error: function(xhr, status, error) {
+                console.log('errorrr');
+                
                 console.error("Error:", error);
             }
         });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'All fields are required',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    });
+
+    $('#export-excel').on('click', function () {
+        var fromdate = $('#fromdate').val();
+        var todate = $('#todate').val();
+        var department = $('#department\\[\\]').val(); 
+        var holiday_date = $('#holiday_date').val();
+        console.log(holiday_date);
+
+        var dates = holiday_date.split(',');
+        var days = dates.map(function(dateStr) {
+            var parts = dateStr.trim().split('/');
+            return parts[1];
+        });
+
+        console.log(days);
+        
+
+        var params = $.param({
+            fromdate: fromdate,
+            todate: todate,
+            department: department,
+            days: days
+        });
+
+        window.open('/attendance/export_view?' + params, '_blank');
+    });
+
+    $("#submit-import").click(function() {
+        $(this).hide();
+        Swal.fire({
+            title: "Process",
+            html: "Importing Data Attendance.. Please Wait!!",
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        })
     });
 </script>
 </html>

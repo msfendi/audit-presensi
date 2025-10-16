@@ -29,7 +29,7 @@ Route::get('/template/auditsewing', [TemplateController::class, 'auditsewing'])-
 Route::get('/template/auditnonsewing', [TemplateController::class, 'auditnonsewing'])->name('template.auditnonsewing');
 
 Route::group(['middleware' => 'guest'], function () {
-    Route::get('/register', [RegisterController::class, 'index'])->name('register');
+    // Route::get('/register', [RegisterController::class, 'index'])->name('register');
     Route::post('/register/guest', [RegisterController::class, 'store'])->name('register.guest');
 
     Route::get('/login', [LoginController::class, 'login'])->name('login.guest');
@@ -70,8 +70,14 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::get('/inventoryqr/batchqr', [AttendanceController::class, 'batchqr'])->name('inventoryqr.batchqr');
     Route::post('/attendance/import', [AttendanceController::class, 'import'])->name('attendance.import');
     Route::post('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
+    Route::get('/attendance/export_view', [AttendanceController::class, 'export_view'])->name('attendance.export_view');
+    Route::post('/attendance/deleteAll', [AttendanceController::class, 'deleteAll'])->name('attendance.deleteAll');
     Route::post('/attendance/auditsewing', [AttendanceController::class, 'auditsewing'])->name('attendance.auditsewing');
     Route::post('/attendance/auditnonsewing', [AttendanceController::class, 'auditnonsewing'])->name('attendance.auditnonsewing');
+    Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
+    Route::get('/attendance/check-master-data', [AttendanceController::class, 'checkMasterData'])->name('attendance.checkMasterData');
+    Route::get('/attendance/edit/{id}', [AttendanceController::class, 'edit'])->name('attendance.edit');
+    Route::post('/attendance/update/{id}', [AttendanceController::class, 'update'])->name('attendance.update');
 
     // Template
     Route::get('/template/audit', [TemplateController::class, 'audit'])->name('template.audit');

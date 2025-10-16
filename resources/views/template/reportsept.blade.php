@@ -246,10 +246,10 @@ $lastDate = 0;
                         @endif
                     @endfor
                     @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                    @if($sisa == 4 || $sisa == 5 || $sisa == 6 || $sisa == 12 || $sisa == 13 || $sisa == 19 || $sisa == 20 || $sisa == 26 || $sisa == 27)
-                        <td> - <br> LBR <br></td>
+                    @if($sisa == 6 || $sisa == 7 || $sisa == 8 || $sisa == 14 || $sisa == 15 || $sisa == 21 || $sisa == 22 || $sisa == 28 || $sisa == 29)
+                        <td> - <br> LBR</td>
                     @else
-                        <td>-<br> - <br> MA <br></td>
+                        <td>-<br> - <br> MA</td>
                     @endif
                         {{-- <td>{{'-'}} <br> {{'-'}} <br> MA <br>{{$sisa}}</td> --}}
                     @endfor
