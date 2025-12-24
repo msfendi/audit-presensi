@@ -81,6 +81,7 @@
                                         <button id='export-excel' type="button" class="btn btn-md btn-warning">Export Excel</button>
                                     </div>
                                 </div>
+                            </div>
                         </form>
                     </div>
                     <div class="card-body">

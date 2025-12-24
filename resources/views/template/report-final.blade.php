@@ -210,31 +210,32 @@ $lastDate = 0;
                             @else
                             
                             <!-- Ada tanggal -->
-                            <td><div class="mb-2">
+                            <td>
+                                <!-- <div class="mb-2"> -->
                                 {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
-                            </div>
+                            <!-- </div> -->
                             <br style="mso-data-placement:same-cell;" />
-                                {{-- <div class="mb-2"> --}}
+                                <!-- {{-- <div class="mb-2"> --}} -->
                                     {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
-                                {{-- </div> --}}
+                                <!-- {{-- </div> --}} -->
                                 <br style="mso-data-placement:same-cell;" />
 
                                 @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
-                                    {{-- <div class="mb-2"> --}}
+                                    <!-- {{-- <div class="mb-2"> --}} -->
                                         MSK
-                                    {{-- </div> --}}
+                                    <!-- {{-- </div> --}} -->
                                 @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
-                                    {{-- <div class="mb-2"> --}}
+                                    <!-- {{-- <div class="mb-2"> --}} -->
                                         LBR
-                                    {{-- </div> --}}
+                                    <!-- {{-- </div> --}} -->
                                 @elseif(in_array(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'), $days))
-                                    {{-- <div class="mb-2"> --}}
+                                    <!-- {{-- <div class="mb-2"> --}} -->
                                         {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
-                                    {{-- </div> --}}
+                                    <!-- {{-- </div> --}} -->
                                 @else
-                                    {{-- <div> --}}
+                                    <!-- {{-- <div> --}} -->
                                         {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
-                                    {{-- </div> --}}
+                                    <!-- {{-- </div> --}} -->
                                 @endif
                             </td>
 
