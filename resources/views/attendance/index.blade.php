@@ -91,44 +91,16 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>NPK</th>
-                                        <th>Nama</th>
+                                        <th>Nama Karyawan</th>
                                         <th>Tanggal</th>
                                         <th>Subdivisi</th>
                                         <th>Jam Pagi</th>
                                         <th>Jam Siang</th>
                                         <th>Jam Malam</th>
                                         <th>Status</th>
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($employees as $employee)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $employee->NPK }}</td>
-                                        <td>{{ $employee->NAMA_KARYAWAN }}</td>
-                                        <td>{{ $employee->TANGGAL }}</td>
-                                        <td>{{ $employee->SUBDIVISI }}</td>
-                                        <td>{{ $employee->JAM_PAGI ?? '-' }}</td>
-                                        <td>{{ $employee->JAM_SIANG ?? '-' }}</td>
-                                        <td>{{ $employee->JAM_MALAM ?? '-' }}</td>
-                                        <td>{{ $employee->KETERANGAN ?? '-' }}</td>
-                                        <td class="text-center">
-                                            <a class="btn btn-primary btn-circle btn-sm" href="{{ route('attendance.edit', $employee->id) }}">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            @if (request()->get('void') == 'false' || request()->get('void') == '')
-                                            {{-- <a class="btn btn-danger btn-circle btn-sm btn-void-record" data-void-link="{{ route('attendance.void', ['id' => $attendance->id]) }}" data-void-name="{{ $attendance->item_name }}" data-toggle="modal" data-target="#voidModal">
-                                                <i class="fas fa-ban"></i>
-                                            </a> --}}
-                                            @elseif (request()->get('void') == 'true')
-                                            {{-- <a class="btn btn-success btn-circle btn-sm btn-restore-record" data-restore-link="{{ route('attendance.restore', ['id' => $attendance->id]) }}" data-restore-name="{{ $attendance->item_name }}" data-toggle="modal" data-target="#restoreModal">
-                                                <i class="fas fa-history"></i>
-                                            </a> --}}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -238,6 +210,28 @@
 {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> --}}
 <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" rel="stylesheet"/>
+
+<script>
+    var tableAttendance = $('#dataTable').DataTable({
+    destroy: true,
+    responsive: true,
+    ajax: '{{ route("attendance.showAttendance") }}',
+    columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            { data: 'NPK', name: 'NPK', orderable: false },
+            { data: 'NAMA_KARYAWAN', name: 'NAMA_KARYAWAN', orderable: false },
+            { data: 'TANGGAL', name: 'TANGGAL', orderable: false },
+            { data: 'SUBDIVISI', name: 'SUBDIVISI', orderable: false },
+            { data: 'JAM_PAGI', name: 'JAM_PAGI', orderable: false },
+            { data: 'JAM_SIANG', name: 'JAM_SIANG', orderable: false },
+            { data: 'JAM_MALAM', name: 'JAM_MALAM', orderable: false },
+            { data: 'STATUS', name: 'STATUS', orderable: false },
+        ],
+    });
+    // setInterval( function () {
+    //     tableCanteen.ajax.reload();
+    // }, 1000);
+</script>
 
 <script type="text/javascript">
     $('.btn-delete-record').on('click', function () {

@@ -78,6 +78,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/attendance/check-master-data', [AttendanceController::class, 'checkMasterData'])->name('attendance.checkMasterData');
     Route::get('/attendance/edit/{id}', [AttendanceController::class, 'edit'])->name('attendance.edit');
     Route::post('/attendance/update/{id}', [AttendanceController::class, 'update'])->name('attendance.update');
+    Route::get('/attendance/showAttendance', [AttendanceController::class, 'showAttendance'])->name('attendance.showAttendance');
 
     // Template
     Route::get('/template/audit', [TemplateController::class, 'audit'])->name('template.audit');

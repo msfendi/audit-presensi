@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AuditExport;
 use App\Imports\AttendanceImport;
 use App\Models\Attendance;
+use App\Models\Audit;
 use Dompdf\Dompdf;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 // use Dompdf\Options;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 // use Knp\Snappy\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use RealRashid\SweetAlert\Facades\Alert;
+use Yajra\DataTables\Facades\DataTables;
 
 class AttendanceController extends Controller
 {
@@ -42,20 +44,31 @@ class AttendanceController extends Controller
         // });
 
         $employees = DB::connection('sqlsrv')->table('AUDIT')
-                ->select('id', 'NPK', 'NAMA_KARYAWAN', 'KODE_BAGIAN', 'SUBDIVISI', 'TANGGAL', 'JAM_PAGI', 'JAM_SIANG', 'JAM_MALAM', 'STATUS AS KETERANGAN')
-                ->orderBy('KODE_BAGIAN', 'ASC')
-                ->orderBy('NPK', 'ASC')
-                ->orderBy('TANGGAL', 'ASC')
-                ->get();
+            ->select('id', 'NPK', 'NAMA_KARYAWAN', 'KODE_BAGIAN', 'SUBDIVISI', 'TANGGAL', 'JAM_PAGI', 'JAM_SIANG', 'JAM_MALAM', 'STATUS AS KETERANGAN')
+            ->orderBy('KODE_BAGIAN', 'ASC')
+            ->orderBy('NPK', 'ASC')
+            ->orderBy('TANGGAL', 'ASC')
+            ->take(100)
+            ->get();
 
         // Use Cache Cache for employee group
         $employeeGroupChutex = DB::connection('sqlsrv')->table('AUDIT')
-                ->select(DB::raw('MIN(SUBDIVISI) AS SUBDIVISI'), 'KODE_BAGIAN')
-                ->groupBy('KODE_BAGIAN')
-                ->orderBy('KODE_BAGIAN', 'ASC')
-                ->get();
+            ->select(DB::raw('MIN(SUBDIVISI) AS SUBDIVISI'), 'KODE_BAGIAN')
+            ->groupBy('KODE_BAGIAN')
+            ->orderBy('KODE_BAGIAN', 'ASC')
+            ->get();
 
         return view('attendance.index', compact('employees', 'employeeGroupChutex'));
+    }
+
+    public function showAttendance()
+    {
+        $query = Audit::query()
+            ->get();
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->make(true);
     }
 
     public function import(Request $request)
@@ -73,7 +86,7 @@ class AttendanceController extends Controller
         if ($import) {
             // Cache::forget('employees_list');
             // Cache::forget('employee_group_list');
-            
+
             Alert::success('Import Successfully!', 'Attendance data successfully imported!');
             return redirect()->intended('attendance/index')->with(['success' => 'Data Berhasil Diimport!']);
         } else {
@@ -115,7 +128,7 @@ class AttendanceController extends Controller
         // ->get();
 
         $dates = explode(',', $request->holiday_date);
-        $days = array_map(function($dateStr) {
+        $days = array_map(function ($dateStr) {
             $parts = explode('/', trim($dateStr));
             return $parts[1];
         }, $dates);
@@ -207,10 +220,12 @@ class AttendanceController extends Controller
         $employees = $employeesChutex->orderBy('KODE_BAGIAN', 'ASC')->orderBy('NPK', 'ASC')->orderBy('TANGGAL', 'ASC')->get();
 
         $days = $request->days;
+        // dd($days);
         return view('template.report-final', compact('employees', 'employeeGroup', 'days'));
     }
 
-    public function export_view(Request $request) {
+    public function export_view(Request $request)
+    {
         return Excel::download(
             new AuditExport(
                 $request->fromdate,

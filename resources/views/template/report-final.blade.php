@@ -10,8 +10,12 @@ $npkBefore = '';
 $getTotalDays = null;
 $getTanggal = false;
 $sameNPK = false;
+$tempNPK = '';
+$tempKODE = '';
 $year = '';
 $month = '';
+$tidakFinger = 0;
+$anomali = false;
 
 $loopDays = 1;
 
@@ -140,133 +144,205 @@ $lastDate = 0;
 </head>
 <body>
     <div class="header">
-        @for($i = 0; $i < 31; $i++)
-            @if($employees[$i]->TANGGAL != null && $getTanggal == false)
-                <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[0]->TANGGAL)->format('F Y')}}</h2>
-                @php
-                    $getTotalDays = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->daysInMonth;
-                    $getTanggal = true;
-                    $year = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('Y');
-                    $month = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('m');
-                @endphp
-            @endif
-        @endfor
+    @for($i = 0; $i < 31; $i++)
+        @if($employees[$i]->TANGGAL != null && $getTanggal == false)
+            <h2>Data Kehadiran Karyawan - {{\Carbon\Carbon::parse($employees[0]->TANGGAL)->format('F Y')}}</h2>
+            @php
+                $getTotalDays = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->daysInMonth;
+                $getTanggal = true;
+                $year = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('Y');
+                $month = \Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('m');
+            @endphp
+        @endif
+    @endfor
     </div>
 
     <div class="table-container">
         <table>
-        @for($head = 0; $head < count($employeeGroup); $head++)
-            @if($deptBefore != $employeeGroup[$head]->KODE_BAGIAN)
-                <tr>
-                    <th>Dept</th>
-                    <th>NPK</th>
-                    <th >Nama Karyawan</th>
-                    @for($date = 1; $date <= $getTotalDays; $date++)
-                        <th>{{ $date }}</th>
-                    @endfor
-                    <th>Keterangan</th>
-                </tr>
-                @php
-                    $deptBefore = $employeeGroup[$head]->KODE_BAGIAN;
-                @endphp
-            @endif
-            <tr>
-                    @for($i = 0; $i < count($employees); $i++)
-                    <!-- NPK Sama -->
-                        @if($employeeGroup[$head]->NPK == $employees[$i]->NPK)
-                            @if($sameNPK == false)
-                                <td>
-                                    {{ $employees[$i]->SUBDIVISI }}
-                                </td>
-                                <td>    
-                                    {{ $employees[$i]->NPK }}
-                                </td>
-                                <td>
-                                    {{ $employees[$i]->NAMA_KARYAWAN }}
-                                </td>
-                                @php
-                                    $sameNPK = true;
-                                @endphp
-                            @endif
-                            @for($loopDays;$loopDays < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');$loopDays++)
-                                <!-- Tidak ada absen -->
-                                @if(in_array($loopDays, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . $loopDays)->isWeekend())
-                                    <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> LBR</td>
-                                @else
-                                    {{-- @if($loopDays == 17 || $loopDays == 18 || $loopDays == 24 || $loopDays == 25 || $loopDays == 31)
-                                        <td>-<br> - <br> LBR</td>
-                                    @else --}}
-                                        <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA </td>
-                                    {{-- @endif --}}
-                                @endif
-                            @endfor
-
-                            <!-- Tanggal null -->
-                            @if($employees[$i]->TANGGAL == null)
-                                @php
-                                    $loopDays = $getTotalDays;
-                                @endphp
-                                <td>{{'-'}} <br style="mso-data-placement:same-cell;" /> {{'-'}} <br style="mso-data-placement:same-cell;" /> MA</td> {{-- Not execute --}}
+            @for($i = 0; $i < count($employees); $i++)
+                <!-- NPK BEDA -->
+                @if($tempNPK != $employees[$i]->NPK)
+                    <!-- KARYAWAN KELUAR TIDAK SAMPAI TUTUP BUKU -->
+                    @if(($lastDate < $getTotalDays) && $lastDate != 0)
+                        @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
+                            @if(in_array($sisa + 1, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . ($sisa + 1))->isWeekend())
+                                <td> - <br style="mso-data-placement:same-cell;" /> LBR <br style="mso-data-placement:same-cell;" /> </td>
                             @else
-                            
-                            <!-- Ada tanggal -->
-                            <td>
-                                <!-- <div class="mb-2"> -->
-                                {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                                <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA <br style="mso-data-placement:same-cell;" /></td>
+                            @endif
+                        @endfor
+                        @php
+                            $lastDate = 0;
+                        @endphp
+                    @endif
+                    <!-- KARYAWAN MASUK SETELAH BUKA BUKU -->
+                    @if($i>1)
+                        <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
+                    @endif
+                    <!-- KODE BAGIAN BEDA -->
+                    @if($tempKODE != $employees[$i]->KODE_BAGIAN)
+                    <tr>
+                        <th>Dept</th>
+                        <th>NPK</th>
+                        <th >Nama Karyawan</th>
+                        @for($date = 1; $date <= $getTotalDays; $date++)
+                            <th>{{ $date }}</th>
+                        @endfor
+                        <th>Keterangan</th>
+                    </tr>
+                    @else
+                        @php
+                            $tempKODE = $employees[$i]->KODE_BAGIAN;
+                        @endphp
+                    @endif
+                <tr>
+                    <td>
+                        {{ $employees[$i]->SUBDIVISI }}
+                    </td>
+                    <td>    
+                        {{ $employees[$i]->NPK }}
+                    </td>
+                    <td>
+                        {{ $employees[$i]->NAMA_KARYAWAN }}
+                    </td>
+
+                    <!-- JIKA NPK BEDA DAN TANGGAL PERTAMA ADALAH 1 -->
+                    @if((int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') == 1) 
+                        <td>
+                            <!-- <div class="mb-2"> -->
+                            {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
                             <!-- </div> -->
                             <br style="mso-data-placement:same-cell;" />
+                            <!-- {{-- <div class="mb-2"> --}} -->
+                                {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                            <!-- {{-- </div> --}} -->
+                            <br style="mso-data-placement:same-cell;" />
+
+                            @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
                                 <!-- {{-- <div class="mb-2"> --}} -->
-                                    {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                                    MSK
                                 <!-- {{-- </div> --}} -->
-                                <br style="mso-data-placement:same-cell;" />
-
-                                @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
-                                    <!-- {{-- <div class="mb-2"> --}} -->
-                                        MSK
-                                    <!-- {{-- </div> --}} -->
-                                @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
-                                    <!-- {{-- <div class="mb-2"> --}} -->
-                                        LBR
-                                    <!-- {{-- </div> --}} -->
-                                @elseif(in_array(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'), $days))
-                                    <!-- {{-- <div class="mb-2"> --}} -->
-                                        {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
-                                    <!-- {{-- </div> --}} -->
-                                @else
-                                    <!-- {{-- <div> --}} -->
-                                        {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
-                                    <!-- {{-- </div> --}} -->
-                                @endif
-                            </td>
-
+                            @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
+                                <!-- {{-- <div class="mb-2"> --}} -->
+                                    LBR
+                                <!-- {{-- </div> --}} -->
+                            @elseif(in_array(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'), $days))
+                                <!-- {{-- <div class="mb-2"> --}} -->
+                                    {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
+                                <!-- {{-- </div> --}} -->
+                            @else
+                                <!-- {{-- <div> --}} -->
+                                    {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
+                                <!-- {{-- </div> --}} -->
                             @endif
-                            @php
-                                $loopDays++;
-                                $lastDate = (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');
-                            @endphp
-                            
-                        @else
-                        <!-- Beda NPK -->
-                        @php
-                            $loopDays = 1;
-                        @endphp
+                        </td>
+                        <!-- ANOMALI 1 TANGGAL -->
+                        @if($employees[$i]->NPK != $employees[$i+1]->NPK)
+                            @for($sisa = 1; $sisa < $getTotalDays; $sisa++)
+                                @if(in_array($sisa + 1, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . ($sisa + 1))->isWeekend())
+                                    <td> - <br style="mso-data-placement:same-cell;" /> LBR <br style="mso-data-placement:same-cell;" /> </td>
+                                @else
+                                    <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA <br style="mso-data-placement:same-cell;" /></td>
+                                @endif
+                            @endfor
                         @endif
-                    @endfor
-                    @for($sisa = $lastDate; $sisa < $getTotalDays; $sisa++)
-                    @if(in_array($sisa + 1, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . ($sisa + 1))->isWeekend())
-                    {{-- @if($sisa == 4 || $sisa == 5 || $sisa == 6 || $sisa == 12 || $sisa == 13 || $sisa == 19 || $sisa == 20 || $sisa == 26 || $sisa == 27) --}}
-                        <td> - <br style="mso-data-placement:same-cell;" /> LBR <br style="mso-data-placement:same-cell;" /> </td>
                     @else
-                        <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA <br style="mso-data-placement:same-cell;" /></td>
+                        @for($firstDate = 1; $firstDate < (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'); $firstDate++)
+                            @if(in_array($firstDate + 1, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . ($firstDate + 1))->isWeekend())
+                                <td> - <br style="mso-data-placement:same-cell;" /> LBR <br style="mso-data-placement:same-cell;" /> </td>
+                            @else
+                                <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA <br style="mso-data-placement:same-cell;" /></td>
+                            @endif
+                        @endfor
+                        <td>
+                            <!-- <div class="mb-2"> -->
+                            {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                            <!-- </div> -->
+                            <br style="mso-data-placement:same-cell;" />
+                            <!-- {{-- <div class="mb-2"> --}} -->
+                                {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                            <!-- {{-- </div> --}} -->
+                            <br style="mso-data-placement:same-cell;" />
+
+                            @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
+                                <!-- {{-- <div class="mb-2"> --}} -->
+                                    MSK
+                                <!-- {{-- </div> --}} -->
+                            @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
+                                <!-- {{-- <div class="mb-2"> --}} -->
+                                    LBR
+                                <!-- {{-- </div> --}} -->
+                            @elseif(in_array(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'), $days))
+                                <!-- {{-- <div class="mb-2"> --}} -->
+                                    {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
+                                <!-- {{-- </div> --}} -->
+                            @else
+                                <!-- {{-- <div> --}} -->
+                                    {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
+                                <!-- {{-- </div> --}} -->
+                            @endif
+                        </td>
                     @endif
-                        {{-- <td>{{'-'}} <br> {{'-'}} <br> MA <br>{{$sisa}}</td> --}}
-                    @endfor
-                    <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
+
+                    <!-- PINDAH NPK -->
                     @php
-                        $sameNPK = false;
+                        $tempNPK = $employees[$i]->NPK;
+                        $tempKODE = $employees[$i]->KODE_BAGIAN;
                     @endphp
+                @else
+                    <!-- NPK SAMA -->
+                    @php
+                        $tidakFinger = (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d') - (int)\Carbon\Carbon::parse($employees[$i-1]->TANGGAL)->format('d');
+                    @endphp
+                    @if($tidakFinger > 1)
+                        @for($isi = 1; $isi < $tidakFinger; $isi++)
+                            @if(in_array($isi + 1, $days) || \Carbon\Carbon::createFromFormat('Y-m-d', $year . '-' . $month . '-' . ($isi + 1))->isWeekend())
+                                <td> - <br style="mso-data-placement:same-cell;" /> LBR <br style="mso-data-placement:same-cell;" /> </td>
+                            @else
+                                <td>-<br style="mso-data-placement:same-cell;" /> - <br style="mso-data-placement:same-cell;" /> MA <br style="mso-data-placement:same-cell;" /></td>
+                            @endif
+                        @endfor
+                        @php
+                            $tidakFinger = 0;
+                        @endphp
+                    @endif
+                     <td>
+                        <!-- <div class="mb-2"> -->
+                        {{$employees[$i]->JAM_PAGI != null ? $employees[$i]->JAM_PAGI : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                        <!-- </div> -->
+                        <br style="mso-data-placement:same-cell;" />
+                        <!-- {{-- <div class="mb-2"> --}} -->
+                            {{$employees[$i]->JAM_MALAM != null ? $employees[$i]->JAM_MALAM : ($employees[$i]->JAM_SIANG != null ? $employees[$i]->JAM_SIANG : '-')}}
+                        <!-- {{-- </div> --}} -->
+                        <br style="mso-data-placement:same-cell;" />
+
+                        @if(Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && ($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null))
+                            <!-- {{-- <div class="mb-2"> --}} -->
+                                MSK
+                            <!-- {{-- </div> --}} -->
+                        @elseif((Carbon\Carbon::parse($employees[$i]->TANGGAL)->isWeekend() && $employees[$i]->KETERANGAN != 'CT'))
+                            <!-- {{-- <div class="mb-2"> --}} -->
+                                LBR
+                            <!-- {{-- </div> --}} -->
+                        @elseif(in_array(Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d'), $days))
+                            <!-- {{-- <div class="mb-2"> --}} -->
+                                {{$employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null ? 'MSK' : 'LBR'}}
+                            <!-- {{-- </div> --}} -->
+                        @else
+                            <!-- {{-- <div> --}} -->
+                                {{$employees[$i]->KETERANGAN != null ? $employees[$i]->KETERANGAN : (($employees[$i]->JAM_PAGI != null || $employees[$i]->JAM_SIANG != null || $employees[$i]->JAM_MALAM != null) ? 'MSK' : 'MA')}}
+                            <!-- {{-- </div> --}} -->
+                        @endif
+                    </td>
+                    @php
+                        $lastDate = (int)\Carbon\Carbon::parse($employees[$i]->TANGGAL)->format('d');
+                    @endphp
+                    @if($i == count($employees) - 1)
+                        <td>Jam Masuk <br> Jam Pulang <br> Keterangan </td>
+                    @endif
+                @endif
+            @endfor
             </tr>
-        @endfor
         </table>
     </div>
 </body>
